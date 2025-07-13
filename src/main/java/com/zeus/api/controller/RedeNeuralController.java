@@ -39,11 +39,11 @@ public class RedeNeuralController {
 
 		DataSet dataset = new DataSet(Nd4j.create(input), Nd4j.create(output));
 
-		MultiLayerConfiguration config = new NeuralNetConfiguration.Builder().seed(123).updater(new Nesterovs(0.1, 0.9))
+		MultiLayerConfiguration config = new NeuralNetConfiguration.Builder().seed(123)
+				.updater(new Nesterovs(0.1, 0.9))
 				.optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT).list()
 				.layer(new DenseLayer.Builder().nIn(2).nOut(4).activation(Activation.RELU).build())
-				.layer(new OutputLayer.Builder(LossFunctions.LossFunction.MSE).activation(Activation.SIGMOID).nOut(1)
-						.build())
+				.layer(new OutputLayer.Builder(LossFunctions.LossFunction.MSE).activation(Activation.SIGMOID).nOut(1).build())						
 				.build();
 
 		model = new MultiLayerNetwork(config);
@@ -62,7 +62,7 @@ public class RedeNeuralController {
 
 		return "Rede neural treinada e salva em disco.";
 	}
-	
+
 	@PostMapping("/predict")
 	public Map<String, Object> prever(@RequestBody Map<String, Double> entradaJson) {
 		Map<String, Object> resultado = new HashMap<>();
@@ -109,10 +109,10 @@ public class RedeNeuralController {
 		int saidas = output[0].length;
 
 		MultiLayerConfiguration config = new NeuralNetConfiguration.Builder().seed(1234)
-				.updater(new Nesterovs(0.01, 0.9)).optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
-				.list().layer(new DenseLayer.Builder().nIn(entradas).nOut(10).activation(Activation.RELU).build())
-				.layer(new OutputLayer.Builder(LossFunctions.LossFunction.MSE).activation(Activation.IDENTITY)
-						.nOut(saidas).build())
+				.updater(new Nesterovs(0.01, 0.9))
+				.optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT).list()
+				.layer(new DenseLayer.Builder().nIn(entradas).nOut(10).activation(Activation.RELU).build())				
+				.layer(new OutputLayer.Builder(LossFunctions.LossFunction.MSE).activation(Activation.IDENTITY).nOut(saidas).build())						
 				.build();
 
 		model = new MultiLayerNetwork(config);
@@ -142,8 +142,8 @@ public class RedeNeuralController {
 				if (f.exists()) {
 					model = MultiLayerNetwork.load(f, true);
 				} else {
-					resultado.put("erro","O modelo numérico ainda não foi treinado. Chame treinar-numerico primeiro.");
-							
+					resultado.put("erro", "O modelo numérico ainda não foi treinado. Chame treinar-numerico primeiro.");
+
 					return resultado;
 				}
 			}
