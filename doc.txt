@@ -1,0 +1,19 @@
+LLM significa Large Language Model — ou, em português, Modelo de Linguagem de Grande Escala.
+
+Um LLM é um sistema de inteligência artificial treinado com grande quantidade de texto, capaz de:
+
+Entender linguagem natural (como português, inglês, etc.)
+Gerar texto coerente
+Responder perguntas
+Escrever código, resumos, explicações, etc.
+
+Como um LLM funciona?
+É treinado com bilhões de palavras (livros, sites, código, etc.)
+Aprende padrões de linguagem e estatísticas de sequência de palavras
+Quando você faz uma pergunta, ele prediz a próxima palavra mais provável com base no que entendeu
+Esse processo se repete rapidamente para formar frases e respostas completas
+
+
+Curiosidade:
+O termo "grande" se refere à quantidade de parâmetros treinados 
+(ex: GPT-4 tem trilhões), e ao volume de dados de treinamento (terabytes de texto).
