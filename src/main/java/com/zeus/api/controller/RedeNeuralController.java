@@ -1,5 +1,6 @@
 package com.zeus.api.controller;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,8 +19,9 @@ import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.learning.config.Nesterovs;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -27,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class RedeNeuralController {
 
 	private MultiLayerNetwork model;
+	private static final String MODELO_PATH = "modelo-xor.zip";
 
 	@GetMapping("/treinar")
 	public String treinar() {
@@ -50,24 +53,43 @@ public class RedeNeuralController {
 			model.fit(new ListDataSetIterator<>(dataset.asList(), 4));
 		}
 
-		return "Rede neural treinada para XOR";
-	}
-
-	@GetMapping("/predict")
-	public Map<String, Object> prever(@RequestParam double x1, @RequestParam double x2) {
-		Map<String, Object> resultado = new HashMap<>();
-
-		if (model == null) {
-			resultado.put("erro", "A rede ainda não foi treinada. Chame /treinar primeiro.");
-			return resultado;
+		try {
+			model.save(new File(MODELO_PATH), true);
+		} catch (Exception e) {
+			return "Erro ao salvar o modelo: " + e.getMessage();
 		}
 
-		INDArray input = Nd4j.create(new double[] { x1, x2 }, new int[] { 1, 2 });
-		INDArray output = model.output(input);
-
-		resultado.put("entrada", new double[] { x1, x2 });
-		resultado.put("saida_prevista", output.getDouble(0));
-		return resultado;
+		return "Rede neural treinada e salva em disco.";
 	}
 
+	@PostMapping("/predict")
+	public Map<String, Object> prever(@RequestBody Map<String, Double> entradaJson) {
+		Map<String, Object> resultado = new HashMap<>();
+
+		try {
+			if (model == null) {
+				File f = new File(MODELO_PATH);
+				if (f.exists()) {
+					model = MultiLayerNetwork.load(f, true);
+				} else {
+					resultado.put("erro", "A rede ainda não foi treinada. Chame /treinar primeiro.");
+					return resultado;
+				}
+			}
+
+			double x1 = entradaJson.getOrDefault("x1", 0.0);
+			double x2 = entradaJson.getOrDefault("x2", 0.0);
+			INDArray input = Nd4j.create(new double[] { x1, x2 }, new int[] { 1, 2 });
+			INDArray output = model.output(input);
+			double saida = output.getDouble(0);
+
+			resultado.put("entrada", new double[] { x1, x2 });
+			resultado.put("saida_prevista", saida);
+			resultado.put("classificacao", saida >= 0.5 ? 1 : 0);
+		} catch (Exception e) {
+			resultado.put("erro", "Falha ao prever: " + e.getMessage());
+		}
+
+		return resultado;
+	}
 }

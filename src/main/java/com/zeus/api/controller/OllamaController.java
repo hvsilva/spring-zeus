@@ -1,5 +1,7 @@
 package com.zeus.api.controller;
 
+import java.util.Map;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,7 +20,7 @@ public class OllamaController {
     }
 
     @GetMapping("/responder")
-    public String responder(@RequestParam String pergunta) {
+    public Map<String, Object> responder(@RequestParam String pergunta) {
         return ollamaService.perguntar(pergunta);
     }
 }
