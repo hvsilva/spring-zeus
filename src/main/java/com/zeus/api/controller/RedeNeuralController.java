@@ -142,8 +142,8 @@ public class RedeNeuralController {
 				if (f.exists()) {
 					model = MultiLayerNetwork.load(f, true);
 				} else {
-					resultado.put("erro",
-							"O modelo numérico ainda não foi treinado. Chame /treinar-numerico primeiro.");
+					resultado.put("erro","O modelo numérico ainda não foi treinado. Chame treinar-numerico primeiro.");
+							
 					return resultado;
 				}
 			}
