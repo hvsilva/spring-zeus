@@ -1,43 +1,32 @@
 package com.zeus.api.controller;
 
-import ai.onnxruntime.*;
-import org.json.JSONObject;
-import org.springframework.web.bind.annotation.*;
-
-import java.nio.file.*;
 import java.nio.LongBuffer;
-import java.util.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.json.JSONObject;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import ai.onnxruntime.OnnxTensor;
+import ai.onnxruntime.OrtEnvironment;
+import ai.onnxruntime.OrtSession;
+import lombok.extern.log4j.Log4j2;
+
+@Log4j2
 @RestController
 @RequestMapping("/onnx-transformer")
 public class TransformerOnnxController {
 
     private final Map<Integer, String> vocab;
-
-    public TransformerOnnxController() throws Exception {
-        String json = Files.readString(Paths.get("src/main/resources/LLM/vocab.json"));
-        JSONObject jsonObject = new JSONObject(json);
-        Map<Integer, String> map = new HashMap<>();
-        for (String key : jsonObject.keySet()) {
-            int index = jsonObject.getInt(key);
-            map.put(index, key);
-        }
-        this.vocab = map;
-    }
-
-    private String detokenizar(List<String> tokens) {
-        StringBuilder texto = new StringBuilder();
-        for (int i = 0; i < tokens.size(); i++) {
-            String t = tokens.get(i);
-            // Regras básicas para BPE: sufixos começando com ▁ ou sem espaço inicial
-            if (i > 0 && !t.startsWith("\u2581") && !t.startsWith(" ") && !t.equals("\n")) {
-                texto.append("");
-            }
-            texto.append(t.replace("\u2581", " ")); // GPT-2 usa espaço codificado como U+2581
-        }
-        return texto.toString().trim();
-    }
 
     @PostMapping("/prever")
     public Map<String, Object> prever(@RequestBody Map<String, Object> payload) throws Exception {
@@ -103,7 +92,39 @@ public class TransformerOnnxController {
             resposta.put("tokenDecodificado", tokenDecodificado);
             resposta.put("sequenciaAtualizada", novaLista);
             resposta.put("textoDecodificado", textoDecodificado);
+            
+            log.info("[Resposta] : {} ", resposta);
+            
             return resposta;
         }
+    }
+    
+    public TransformerOnnxController() throws Exception {
+        byte[] bytes = Files.readAllBytes(Paths.get("src/main/resources/LLM/vocab.json"));
+        String json = new String(bytes, StandardCharsets.UTF_8);
+        JSONObject jsonObject = new JSONObject(json);
+        Map<Integer, String> map = new HashMap<>();
+        for (String key : jsonObject.keySet()) {
+            int index = jsonObject.getInt(key);
+            map.put(index, key);
+        }
+        this.vocab = map;
+    }
+
+    private String detokenizar(List<String> tokens) {
+        StringBuilder byteString = new StringBuilder();
+        for (String token : tokens) {
+            if (token.startsWith("Ġ")) {
+                byteString.append(" ");
+                byteString.append(token.substring(1));
+            } else {
+                byteString.append(token);
+            }
+        }
+        byte[] bytes = new byte[byteString.length()];
+        for (int i = 0; i < byteString.length(); i++) {
+            bytes[i] = (byte) byteString.charAt(i);
+        }
+        return new String(bytes, StandardCharsets.UTF_8);
     }
 }
