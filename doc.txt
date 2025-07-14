@@ -17,3 +17,17 @@ Esse processo se repete rapidamente para formar frases e respostas completas
 Curiosidade:
 O termo "grande" se refere à quantidade de parâmetros treinados 
 (ex: GPT-4 tem trilhões), e ao volume de dados de treinamento (terabytes de texto).
+
+
+| Tipo                                     | Descrição                                                        | Aplicações                                |
+| ---------------------------------------- | ---------------------------------------------------------------- | ----------------------------------------- |
+| **Perceptron**                           | Neurônio simples, usado para problemas linearmente separáveis    | Base teórica                              |
+| **MLP (Multilayer Perceptron)**          | Rede com múltiplas camadas ocultas                               | Classificação, regressão geral            |
+| **CNN (Convolutional Neural Network)**   | Usa convoluções para processar dados espaciais                   | Visão computacional, imagens              |
+| **RNN (Recurrent Neural Network)**       | Redes com memória de estado anterior                             | Séries temporais, texto                   |
+| **LSTM (Long Short-Term Memory)**        | Tipo especial de RNN que resolve problema de longas dependências | Tradução, texto, previsão                 |
+| **GRU (Gated Recurrent Unit)**           | Variante simplificada do LSTM                                    | Idem ao LSTM, mais leve                   |
+| **GAN (Generative Adversarial Network)** | Redes que competem entre si para gerar dados realistas           | Geração de imagens, deepfakes             |
+| **Transformers**                         | Arquitetura baseada em atenção                                   | Tradução, LLMs como GPT, BERT, etc.       |
+| **Autoencoders**                         | Redes que comprimem e reconstróem dados                          | Redução de dimensionalidade, reconstrução |
+| **SOM (Self Organizing Maps)**           | Rede não supervisionada para visualização                        | Clusterização                             |
